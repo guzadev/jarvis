@@ -14,7 +14,7 @@ import server
 
 class ProjectDocuments(unittest.TestCase):
     def setUp(self):
-        self.root=Path(self.enterContext(tempfile.TemporaryDirectory()))
+        self.root=Path(self.enterContext(tempfile.TemporaryDirectory())).resolve()
         self.storage=self.root/'internal'
         self.documents=self.root/'Documents'
         self.config={'storage_dir':str(self.storage),'projects_dir':str(self.documents/'Jarvis')}
