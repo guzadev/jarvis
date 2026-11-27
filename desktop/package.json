@@ -1,0 +1,53 @@
+{
+  "name": "jarvis-aurelio-desktop",
+  "version": "0.1.3",
+  "private": true,
+  "description": "Jarvis para Windows: voz elegida, memoria y herramientas en tu PC",
+  "author": "guzadev",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.cjs",
+    "pack": "electron-builder --win --x64 --dir --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.4.1",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.guzadev.jarvis",
+    "productName": "Jarvis",
+    "asar": true,
+    "directories": {
+      "output": "../.build/desktop"
+    },
+    "files": [
+      "main.cjs",
+      "runtime.cjs",
+      "policy.cjs",
+      "preload.cjs",
+      "onboarding.html",
+      "onboarding.js",
+      "icon.png",
+      "package.json"
+    ],
+    "win": {
+      "icon": "icon.ico",
+      "signExecutable": false
+    },
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true
+    },
+    "electronLanguages": [
+      "es",
+      "es-419",
+      "en-US"
+    ]
+  },
+  "homepage": "https://github.com/guzadev/jarvis"
+}

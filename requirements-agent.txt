@@ -1,0 +1,14 @@
+OpenJarvis @ https://github.com/open-jarvis/OpenJarvis/archive/c3ed63f1d2a2c0c1f7dabbc69050e1968a11dc10.zip
+numpy
+scipy
+sympy
+matplotlib
+psutil
+soundfile
+sherpa-onnx==2.0.1
+faster-whisper==1.2.1
+ddgs
+
+openpyxl==3.1.5
+python-docx==1.2.0
+-r requirements-data.txt

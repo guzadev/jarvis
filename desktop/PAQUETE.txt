@@ -1,0 +1,8 @@
+JARVIS — PAQUETE WINDOWS X64
+
+Ver README.md y docs/DESARROLLO.md. El instalador completo incluye runtimes,
+modelos y perfil de voz. Los archivos personales y las credenciales no se
+empaquetan. La escucha se inicia apagada y no se activa al iniciar Windows.
+Los archivos .bin forman parte del mismo instalador y se distribuyen juntos.
+Las ediciones ExistingOnly requieren una instalación previa y no se publican
+como instalador completo.

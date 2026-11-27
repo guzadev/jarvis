@@ -1,0 +1,16 @@
+.env*
+.venv/
+.agent-venv/
+.agent-data/
+.wake-models/
+.wake-config*
+.jarvis*
+.logs/
+__pycache__/
+jarvis-workspace/
+vercel-web/
+.build/
+.tools/
+
+.jarvis-fish.json
+.jarvis-fish.tmp

@@ -1,0 +1,8 @@
+qwen-tts==0.1.1
+transformers==4.57.3
+accelerate==1.12.0
+sox==1.5.0
+onnxruntime==1.32.0
+flatbuffers==25.12.19
+coloredlogs==15.0.1
+humanfriendly==10.0

@@ -1,0 +1,7 @@
+coqui-tts==0.28.0
+transformers==4.57.6
+six==1.17.0
+fastapi==0.165.0
+uvicorn==0.54.0
+soundfile==0.14.0
+httpx==0.28.1
