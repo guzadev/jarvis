@@ -14,6 +14,8 @@ Asistente de escritorio con conversación en tiempo real, voz generada en tu PC,
 
 La descarga completa ocupa varios GB porque contiene Python, las dependencias y los modelos. Reservá **40 GB libres** para descarga e instalación. El descargador necesita Internet y los archivos quedan en la carpeta que elegiste.
 
+Modelos incluidos: **Qwen3-TTS 1.7B Base** para la voz, **Whisper small** para la activación local y **Qwen3 8B** de Ollama como motor local opcional. La configuración inicial conserva OpenAI para conversar; incluir estos modelos no convierte la API de OpenAI en un servicio gratuito.
+
 **Alternativa manual:** descargá `Jarvis-Windows-Instalador.exe` y **todas** las partes `Jarvis-Windows-Instalador-*.bin` de la misma versión. Dejalas juntas en una carpeta y ejecutá ese EXE. `Source code.zip` contiene código; no es el instalador.
 
 ### Requisitos
