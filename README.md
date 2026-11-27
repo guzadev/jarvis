@@ -50,7 +50,7 @@ Crear una app es una tarea en segundo plano. Se considera iniciada cuando el mot
 | **Sistema** | Windows 10/11 de 64 bits. Validado en Windows 11. |
 | **Voz local** | GPU NVIDIA compatible con CUDA y controlador instalado. Probado en RTX 3060. |
 | **Espacio** | Reservá **25 GB libres para la base** y, como orientación, **15 GB adicionales** si elegís modelos de razonamiento. Depende del modelo y del equipo. |
-| **Tamaño del instalador** | Consultá los archivos de la [Release v0.1.4](https://github.com/guzadev/jarvis/releases/tag/v0.1.4). Los pesos de los modelos se descargan por separado. |
+| **Instalador base** | **2,82 GB** frente a 13,4 GB de la edición anterior (**79 % menos**). Los pesos se descargan por separado; ver [Release v0.1.4](https://github.com/guzadev/jarvis/releases/tag/v0.1.4). |
 | **Conversación** | Internet y cuenta OpenAI con saldo de API. |
 | **Tareas con Claude** | Acceso propio a Claude Code; es opcional. |
 
