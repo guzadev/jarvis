@@ -34,12 +34,16 @@ Las pruebas usan respuestas simuladas. No deben abrir el micrófono ni consumir 
 
 ## Compilar el instalador completo
 
-Usá Inno Setup y `desktop/build.ps1` con una carpeta nueva de salida y el almacenamiento preparado. El script incluye Python, entornos, modelos y perfil aprobado por listas controladas; no copia la configuración personal.
+Usá Inno Setup y `desktop/build.ps1` con una carpeta nueva de salida y el almacenamiento preparado. El script incluye Python, entornos y el perfil aprobado por listas controladas; no copia la configuración personal ni los pesos. Los modelos se descargan de Hugging Face y Ollama, con versiones y comprobaciones fijadas. `--include-models` en stage-offline.py queda reservado a una compilación privada offline que no debe subirse a Releases.
 
-Para reconstruir una versión a partir de una carga offline limpia anterior, `scripts/stage-release.py` reutiliza exclusivamente su manifiesto y actualiza el núcleo y el backend. Verificá siempre los archivos y las huellas antes de publicar. El descargador de Windows se compila desde `desktop/download/Downloader.cs`, con el manifiesto de archivos de esa versión embebido.
+Para reconstruir una versión a partir de una carga offline limpia anterior, `scripts/stage-release.py` reutiliza exclusivamente su manifiesto, excluye los modelos y actualiza el núcleo y el backend. Verificá siempre los archivos y las huellas antes de publicar. El descargador de Windows se compila desde `desktop/download/Downloader.cs`, con el manifiesto de archivos de esa versión embebido.
 
 ## Privacidad al publicar
 
-No publicar `.env`, archivos `.jarvis-*`, DPAPI, SQLite, proyectos, artefactos personales, cookies, sesiones Claude, grabaciones de referencia ni carpetas de caché. Los modelos oficiales y el perfil de voz genérico de la distribución se empaquetan por separado; el perfil incluye el texto genérico de referencia necesario para la síntesis.
+No publicar `.env`, archivos `.jarvis-*`, DPAPI, SQLite, proyectos, artefactos personales, cookies, sesiones Claude, grabaciones de referencia ni carpetas de caché. Los pesos de modelos no se distribuyen en GitHub. El perfil de voz genérico sí forma parte del instalador; el perfil incluye el texto genérico de referencia necesario para la síntesis.
 
 Este repositorio se inició desde una exportación limpia del código, sin historial privado. Los archivos de ejemplo contienen valores vacíos o fixtures artificiales. Las versiones deberían incluir SHA-256 y sus notas de compatibilidad; no se anuncia compatibilidad con todo hardware por haber probado un único equipo.
+
+## Gestor de modelos
+
+`bootstrap_models.py` prepara los pesos de voz y activación desde sus publicadores. `local_models.py` administra Ollama y los modelos de razonamiento; las rutas `/api/agent/local/*` muestran inventario, descarga, selección y borrado. Cambiar un modelo de tareas conserva la voz y el proveedor de conversación efectivo. El instalador puede dejar una selección inicial que la app completa al abrir.

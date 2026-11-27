@@ -1,29 +1,54 @@
-JARVIS PARA WINDOWS X64 — 0.1.3 (BETA)
+JARVIS PARA WINDOWS X64 — 0.1.4 (BETA)
 
-Descarga: https://github.com/guzadev/jarvis/releases/tag/v0.1.3
+DESCARGA
+https://github.com/guzadev/jarvis/releases/tag/v0.1.4
 Usá Jarvis-Windows.exe para descargar y abrir el instalador completo.
 Alternativa manual: mantené Jarvis-Windows-Instalador.exe y TODAS las partes
-Jarvis-Windows-Instalador-*.bin en la misma carpeta y abrí el EXE.
+Jarvis-Windows-Instalador-*.bin de esa versión en la misma carpeta y abrí el EXE.
+Consultá el tamaño del instalador en la Release. Los pesos se descargan aparte.
 
-El paquete incluye Python, dependencias, Whisper Small, Qwen3-TTS 1.7B,
-perfil de voz y Ollama/Qwen3:8b. No necesitás instalar Python ni Node.
-La síntesis elegida requiere GPU NVIDIA compatible con CUDA. Probado en RTX3060.
-Reservá al menos40GB libres para descarga e instalación. Windows x64 solamente.
-No se afirma compatibilidad con todos los equipos; es una versión beta.
+ANTES DE INSTALAR
+Windows 10/11 x64. Validado en Windows 11.
+La voz requiere GPU NVIDIA compatible con CUDA y controlador instalado.
+Probado en RTX 3060; la velocidad depende del equipo. Es una versión beta.
+Reservá 25 GB libres para la base y, como orientación, 15 GB adicionales para
+modelos de razonamiento. El espacio y la memoria dependen del modelo y equipo.
+
+El instalador incluye runtimes, Python, dependencias preparadas y el perfil
+de voz. No necesitás instalar Python ni Node. NO incluye los pesos de voz,
+activación ni razonamiento. No se alojan modelos en las Releases de GitHub.
 
 PRIMER INICIO
-1. Pegá TU clave OpenAI en el formulario. Se guarda cifrada en tu usuario Windows.
-2. Abrí Jarvis. La escucha está APAGADA por defecto.
-3. Pulsá ESCUCHA APAGADA · ACTIVAR; decí Jarvis para iniciar la conversación.
-4. Apagar escucha corta micrófono y sesión. Cerrar con X sale de la app.
-   Ocultar/minimizar o cambiar de ventana también suspende la escucha.
+1. Abrí Jarvis. Descarga automáticamente los pesos oficiales desde Hugging Face:
+   Qwen3-TTS 1.7B Base: 4,544 GB. Whisper small: 0,486 GB. Total: 5,03 GB.
+   Revisiones fijadas y verificación SHA-256. La preparación muestra progreso,
+   permite reanudar o cancelar y conserva el perfil de voz elegido.
+   Necesitás Internet y espacio local; los pesos se suman al instalador.
+2. Pegá TU clave OpenAI en el formulario. Se guarda cifrada en tu usuario Windows.
+3. La escucha empieza APAGADA. Pulsá ESCUCHA APAGADA · ACTIVAR y decí Jarvis.
+   También podés pulsar Iniciar voz cuando los componentes estén preparados.
+4. Apagar corta micrófono y sesión. Cerrar con X sale de la app.
+   Ocultar, minimizar o cambiar de ventana también suspende la escucha.
 5. Para Claude Code y APIs propias, consultá las guías del repositorio.
 
+RAZONAMIENTO LOCAL (OPCIONAL)
+El instalador permite elegir Qwen3 1.7B, 4B, 8B o 14B. Ollama se obtiene de
+sus Releases oficiales; los modelos se descargan desde el registro de Ollama.
+En la app: Acciones > Motor, voz y carpeta > Modelos locales.
+Podés ver los instalados, descargar otro, cambiar o eliminar uno anterior.
+El motor anterior se conserva hasta que el nuevo está listo. El modelo en uso
+queda protegido; para borrar otro tenés que escribir su nombre exacto.
+Los tamaños y las notas de memoria son orientativos. El perfil de voz se conserva.
+
+GUÍAS
 OpenAI: https://github.com/guzadev/jarvis/blob/main/docs/CLAVE-OPENAI.md
 Claude: https://github.com/guzadev/jarvis/blob/main/docs/CONECTAR-CLAUDE.md
 APIs: https://github.com/guzadev/jarvis/blob/main/docs/AGREGAR-APIS.md
+Instalación: https://github.com/guzadev/jarvis/blob/main/docs/INSTALACION-WINDOWS.md
 
-Cada persona usa sus propias cuentas y saldo. OpenAI es de pago por uso;
-Claude depende del acceso contratado en su cuenta. La voz se genera en la PC.
+Cada persona usa sus propias cuentas y saldo. OpenAI cobra por uso, por separado
+de ChatGPT Plus/Pro. Claude depende del acceso de tu cuenta. La voz se genera en
+la PC; durante la conversación activa el audio se envía a OpenAI.
 No se incluyen claves, cuentas, memoria ni proyectos del desarrollador.
 Los trabajos nuevos se guardan en Documentos/Jarvis/General.
+El ejecutable no tiene firma de editor comercial; verificá origen y SHA256SUMS.txt.

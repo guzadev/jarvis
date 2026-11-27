@@ -100,6 +100,7 @@
     finally{state.saving=false;renderSettings();renderConnection();}
   }
   function switchProvider(){
+    if($('missionEngine').value==='local'&&window.JarvisLocalModels){renderSettings();window.JarvisLocalModels.open();return;}
     const provider=$('missionEngine').value,select=$('missionModel');select.replaceChildren();
     const values=provider==='openai'?MODELS:provider==='claude'?['Claude Code']:[...new Set([state.agent?.local_model||'qwen3:8b',...(state.agent?.local_models||[])])];
     values.forEach(model=>{const option=el('option','',model);option.value=model;select.append(option);});

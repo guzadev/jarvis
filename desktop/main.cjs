@@ -83,6 +83,9 @@ async function start() {
   update({ busy: true, needsKey: false, error: '', message: 'Comprobando los componentes de Jarvis…' });
   try {
     info = info || await findInstallation();
+    update({ downloading: true, message: 'Preparando los modelos desde sus proveedores oficiales…' });
+    try { await runtime.prepareModels(info, message => update({ message })); }
+    finally { update({ downloading: false }); }
     // The backend validates and loads the selected voice in the background.
     // Importing Torch/CUDA here can freeze onboarding on a cold external disk.
     const key = await storedKey();
@@ -94,11 +97,22 @@ async function start() {
     void fetch(APP_ORIGIN + '/api/speech/preparation', { method: 'POST', signal: AbortSignal.timeout(8000) }).catch(() => {});
     await desktopBridge();
     await window.loadURL(APP_ORIGIN + '/');
+    const choiceFile = path.join(info.root, '.jarvis-install-choice.json');
+    const choice = await runtime.readJSON(choiceFile).catch(() => null);
+    if (['qwen3:1.7b','qwen3:4b','qwen3:8b','qwen3:14b'].includes(choice?.model)) {
+      const response = await fetch(APP_ORIGIN + '/api/agent/local/prepare', { method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: choice.model, activate: true }), signal: AbortSignal.timeout(10000) }).catch(() => null);
+      if (response?.ok) {
+        await fs.unlink(choiceFile).catch(() => {});
+        window.webContents.send('jarvis:local-models-open');
+      }
+    }
     window.setTitle('Jarvis');
     if (!process.argv.includes('--background')) show();
     update({ busy: false, message: 'Jarvis está listo.' });
     // Windows startup is opt-in through the tray menu, never enabled at launch.
   } catch (error) {
+    if (quitting || !window || window.isDestroyed()) return;
     if (window.webContents.getURL() !== setupURL) await window.loadURL(setupURL);
     const message = error.name === 'TimeoutError' || error.name === 'AbortError'
       ? 'La conexión local tardó en iniciar. Tocá Reintentar; tu instalación y tu voz se conservan.' : error.message;
@@ -148,6 +162,7 @@ async function init() {
   tray.on('double-click', show);
   ipcMain.handle('setup:status', event => { if (!isSetup(event)) throw new Error('Origen no permitido.'); return state; });
   ipcMain.handle('setup:retry', event => { if (!isSetup(event)) return; void start(); });
+  ipcMain.handle('setup:cancel-downloads', event => { if (isSetup(event)) runtime.cancelModelDownloads(); });
   ipcMain.handle('setup:connect', async (event, key) => {
     if (!isSetup(event) || !info) return;
     if (typeof key !== 'string' || !/^sk-[\w-]{20,500}$/.test(key.trim())) { update({ error: 'Pegá una clave de OpenAI válida para conectar Jarvis.' }); return; }
@@ -166,7 +181,7 @@ async function init() {
   if (!process.argv.includes('--background')) show();
   await start();
 }
-app.on('before-quit', () => { quitting = true; clearInterval(bridgeTimer); bridge?.close(); if (info) fs.unlink(path.join(info.root, '.jarvis-desktop.json')).catch(() => {}); });
+app.on('before-quit', () => { quitting = true; runtime.cancelModelDownloads(); clearInterval(bridgeTimer); bridge?.close(); if (info) fs.unlink(path.join(info.root, '.jarvis-desktop.json')).catch(() => {}); });
 // A shared companion can serve an explicitly opened web UI; wake capture requires
 // a live foreground client and cannot reopen a closed application.
 app.on('window-all-closed', () => { if (quitting) app.quit(); });

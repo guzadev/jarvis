@@ -15,8 +15,8 @@ using System.Windows.Forms;
 using System.Diagnostics;
 [assembly: AssemblyTitle("Jarvis para Windows")]
 [assembly: AssemblyProduct("Jarvis")]
-[assembly: AssemblyVersion("0.1.3.0")]
-[assembly: AssemblyFileVersion("0.1.3.0")]
+[assembly: AssemblyVersion("0.1.4.0")]
+[assembly: AssemblyFileVersion("0.1.4.0")]
 
 public sealed class ReleaseFile { public string name; public string sha256; public long bytes; }
 public sealed class ReleaseManifest { public string version; public long installed_bytes; public ReleaseFile[] files; }

@@ -180,6 +180,8 @@ def agent_status():
     ready=status['openjarvis_installed'] and (status['openai_configured'] if provider=='openai' else status['local_ready'] if provider=='local' else bool(claude_command()))
     model=status['openai_model'] if provider=='openai' else status['local_model'] if provider=='local' else 'Claude Code'
     status.update(ready=ready,model=model,message=(f'{provider.upper()} configurado · {model}' if ready else 'Falta configurar el motor elegido o terminar la descarga del modelo.'))
+    import local_models
+    status['local_installation']=local_models.state()
     return status
 
 class SettingsIn(BaseModel):
@@ -191,10 +193,60 @@ class SettingsIn(BaseModel):
 
 @router.post('/agent/settings')
 def update_settings(body:SettingsIn):
-    try:app_runtime.save_settings(body.model_dump(exclude_none=True,exclude_unset=True))
+    import local_models
+    values=body.model_dump(exclude_none=True,exclude_unset=True)
+    try:
+        app_runtime.validate_settings(values)
+        if body.provider=='local':
+            inventory=local_models.installed()
+            if body.local_model not in {item['name'] for item in inventory['installed']}:
+                local_models.prepare(body.local_model,activate_settings=values)
+                return agent_status()
+        local_models.cancel()
+        app_runtime.save_settings(values)
     except ValueError as error:raise HTTPException(400,str(error)) from error
     if body.provider=='local':app_runtime.warm_local_model()
     return agent_status()
+
+
+class LocalModelIn(BaseModel):
+    model:str=Field(min_length=1,max_length=200)
+    activate:bool=True
+
+
+@router.get('/agent/local/models')
+def local_model_inventory():
+    import local_models
+    config=app_runtime.settings()
+    return {**local_models.installed(), 'state':local_models.state(),
+            'provider':config['provider'], 'active_model':config['local_model'] if config['provider']=='local' else None}
+
+
+@router.post('/agent/local/prepare')
+def prepare_local_model(body:LocalModelIn):
+    import local_models
+    try:return local_models.prepare(body.model,activate_settings={'provider':'local','local_model':body.model} if body.activate else None)
+    except ValueError as error:raise HTTPException(409,str(error)) from None
+
+
+@router.post('/agent/local/select')
+def select_local_model(body:LocalModelIn):
+    import local_models
+    try:return local_models.select(body.model)
+    except ValueError as error:raise HTTPException(409,str(error)) from None
+
+
+@router.post('/agent/local/remove')
+def remove_local_model(body:LocalModelIn):
+    import local_models
+    try:return local_models.remove(body.model)
+    except ValueError as error:raise HTTPException(409,str(error)) from None
+
+
+@router.post('/agent/local/cancel')
+def cancel_local_model():
+    import local_models
+    return local_models.cancel()
 
 @router.get('/missions')
 def missions(project:str|None=None,limit:int=Query(default=100,ge=1,le=200),before:float|None=None):

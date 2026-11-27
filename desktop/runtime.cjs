@@ -6,6 +6,33 @@ const { promisify } = require('node:util');
 const crypto = require('node:crypto');
 const { ownedListener, APP_ORIGIN } = require('./policy.cjs');
 const execute = promisify(execFile);
+let modelDownloads;
+function cancelModelDownloads() { modelDownloads?.kill(); }
+async function prepareModels(info, progress) {
+  if (modelDownloads) throw new Error('La preparación de los modelos ya está en curso.');
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/KEY|TOKEN|SECRET|PASSWORD/i.test(key)));
+  env.PYTHONUTF8 = '1'; env.PYTHONIOENCODING = 'utf-8';
+  await new Promise((resolve, reject) => {
+    const child = spawn(info.python, ['-u', path.join(info.root, 'bootstrap_models.py'), '--storage', info.storage],
+      { cwd: info.root, env, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'] });
+    modelDownloads = child;
+    let buffered = '', failure;
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', text => {
+      buffered += text;
+      if (buffered.length > 100000) { child.kill(); return; }
+      const lines = buffered.split(/\r?\n/); buffered = lines.pop();
+      for (const line of lines) {
+        try { const item = JSON.parse(line); if (item.error) failure = String(item.error).slice(0,500); else if(item.message) progress(String(item.message).slice(0,500)); } catch {}
+      }
+    });
+    child.on('error', error => { if (modelDownloads === child) modelDownloads = null; reject(error); });
+    child.on('close', code => {
+      if (modelDownloads === child) modelDownloads = null;
+      if (code === 0) resolve(); else reject(new Error(failure || 'La descarga de los modelos se interrumpió. Tocá Reintentar para continuar.'));
+    });
+  });
+}
 async function exists(file) { try { await fs.access(file); return true; } catch { return false; } }
 async function readJSON(file) { return JSON.parse(await fs.readFile(file, 'utf8')); }
 function runPowerShell(source) {
@@ -109,4 +136,4 @@ async function startBackend(info, apiKey) {
   }
   throw new Error('Jarvis estÃ¡ tardando en iniciar. TocÃ¡ Reintentar; no hace falta reinstalar los modelos.');
 }
-module.exports = { exists, readJSON, inspect, prepareBundled, checkVoice, startBackend, stopBackend, listener };
+module.exports = { exists, readJSON, inspect, prepareBundled, prepareModels, cancelModelDownloads, checkVoice, startBackend, stopBackend, listener };

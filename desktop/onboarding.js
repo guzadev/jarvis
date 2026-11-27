@@ -6,6 +6,7 @@ function render(state) {
   $('connect').hidden = !state.needsKey;
   $('error').hidden = !state.error; $('error').textContent = state.error || '';
   $('recovery').hidden = !state.error;
+  $('cancelDownloads').hidden = !state.downloading;
   $('connect').querySelector('button').disabled = Boolean(state.busy);
 }
 window.jarvisSetup.onStatus(render);
@@ -15,4 +16,5 @@ $('connect').addEventListener('submit', async event => {
   await window.jarvisSetup.connect(key);
 });
 $('retry').addEventListener('click', () => window.jarvisSetup.retry());
+$('cancelDownloads').addEventListener('click', () => window.jarvisSetup.cancelDownloads());
 $('diagnostics').addEventListener('click', () => window.jarvisSetup.diagnostics());

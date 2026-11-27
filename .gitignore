@@ -40,3 +40,10 @@ release-work/
 *.db-wal
 .env.*
 !.env.example
+
+# Model weights belong to their publishers, never to this repository.
+*.safetensors
+*.gguf
+*.onnx
+*.pth
+*.bin

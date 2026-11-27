@@ -8,7 +8,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const mathManifest=JSON.parse(await readFile(join(root,'public/assets/vendor/vendor-math-files.json'),'utf8'));
 const mathAssets=mathManifest.files.map(item=>item.path);
 if(mathAssets.some(path=>!/^assets\/vendor\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_.-]+$/.test(path)||path.split('/').some(part=>part==='..')))throw new Error('Ruta de biblioteca matemÃ¡tica incorrecta.');
-export const publicAssets = ['assets/integrations.css','assets/integrations.js','assets/data-results.css','assets/data-results.js','assets/missions.css', 'assets/missions.js', 'assets/local-voice.js', 'assets/realtime-owned.js', 'assets/molecular-orb.js', 'assets/pc-connection.js',
+export const publicAssets = ['assets/integrations.css','assets/integrations.js','assets/data-results.css','assets/data-results.js','assets/missions.css', 'assets/missions.js', 'assets/local-models.css', 'assets/local-models.js', 'assets/local-voice.js', 'assets/realtime-owned.js', 'assets/molecular-orb.js', 'assets/pc-connection.js',
   'assets/vendor/vendor-math-files.json',...mathAssets,
   ...['marked.min.js','purify.min.js','apexcharts.min.js','gridjs.umd.js','gridjs-mermaid.min.css','fonts.css','manifest.json',
       'font-0.woff2','font-1.woff2','font-2.woff2','font-3.woff2','font-4.woff2'].map(name=>'assets/vendor/'+name)];
@@ -17,6 +17,7 @@ ABRIR_JARVIS_ONLINE.cmd ACTIVAR_INICIO_AUTOMATICO.cmd ACTUALIZAR_JARVIS.cmd
 CONECTAR_CLAUDE.cmd DESACTIVAR_INICIO_AUTOMATICO.cmd DETENER_JARVIS.cmd
 INICIAR_JARVIS.cmd INSTALAR_JARVIS.cmd LICENSE LEEME-COMPANERO.md
 actualizar.ps1 agent_store.py agent_worker.py office_actions.py app_api.py app_runtime.py
+bootstrap_models.py local_models.py whisper-weights.json
 data_tools.py data_credentials.py public_reader.py requirements-data.txt voice_diagnostics.py
 integration_store.py integration_http.py integrations.py
 conectar-claude.ps1 execution_review.py index.html inicio-automatico.ps1

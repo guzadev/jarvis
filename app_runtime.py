@@ -23,12 +23,17 @@ def settings():
     with LOCK:
         return {**DEFAULTS,**(json.loads(CONFIG_PATH.read_text(encoding='utf-8')) if CONFIG_PATH.exists() else {})}
 
+def validate_settings(values):
+    current=settings();current.update(values)
+    if current['provider'] not in ('openai','claude','local'):raise ValueError('Motor no válido')
+    if current['conversation_provider'] not in ('auto','openai','local'):raise ValueError('Motor de conversación no válido')
+    if current['voice'] not in ('auto','local','openai','fish','owned'):raise ValueError('Voz no válida')
+    return current
+
+
 def save_settings(values):
     with LOCK:
-        current=settings();current.update(values)
-        if current['provider'] not in ('openai','claude','local'):raise ValueError('Motor no válido')
-        if current['conversation_provider'] not in ('auto','openai','local'):raise ValueError('Motor de conversación no válido')
-        if current['voice'] not in ('auto','local','openai','fish','owned'):raise ValueError('Voz no válida')
+        current=validate_settings(values)
         CONFIG_PATH.write_text(json.dumps(current,indent=2,ensure_ascii=False),encoding='utf-8')
         return current
 

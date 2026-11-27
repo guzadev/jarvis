@@ -43,6 +43,8 @@ def build(args):
         else:stage.write_bytes(content)
         os.replace(stage,dest);hashes[name]=digest(dest)
     for name,checksum in sorted(index.items()):
+        if args.publisher_downloads and (name.startswith(('data/models/ollama/','data/tools/ollama/','data/models/qwen3-tts-1.7b-base/','data/models/whisper-small/')) or
+                                        (name.startswith('data/.owned-voice-venv/Lib/site-packages/torch/lib/') and name.endswith('.lib'))):continue
         if name.startswith('backend/') and not name.startswith('backend/.venv/'):continue
         if not name.startswith(('backend/.venv/','data/','runtime/')):continue
         src=cache/relative(name)
@@ -68,7 +70,8 @@ def build(args):
         replace(prefix+'/pyvenv.cfg',content=b'home = __JARVIS_PYTHON_HOME__\ninclude-system-site-packages = false\nversion = 3.13.3\n')
     replace('LEEME-INSTALADOR.txt',src=source/'desktop/LEEME-INSTALADOR.txt')
     replace('README.md',src=source/'README.md')
-    for file in sorted((source/'docs').glob('*.md')):replace('docs/'+file.name,src=file)
+    for file in sorted((source/'docs').rglob('*')):
+        if file.is_file():replace('docs/'+file.relative_to(source/'docs').as_posix(),src=file)
     profile=json.loads((out/'data/models/jarvis-owned/profile.json').read_text())
     if set(profile)!={'approved','prepared','engine','model_revision','profile_sha256','sample_sha256'}:
         raise ValueError('Unexpected voice profile metadata')
@@ -81,4 +84,5 @@ def build(args):
 if __name__=='__main__':
     parser=argparse.ArgumentParser()
     for option in ('cache','source','electron','output'):parser.add_argument('--'+option,type=Path,required=True)
+    parser.add_argument('--publisher-downloads',action='store_true',default=True,help='Do not distribute model weights; fetch them from their publishers at setup.')
     build(parser.parse_args())

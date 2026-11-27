@@ -5,7 +5,7 @@
   #error Supply /DOutputFolder=<absolute build directory>
 #endif
 #ifndef Version
-  #define Version "0.1.3"
+  #define Version "0.1.4"
 #endif
 
 [Setup]
@@ -66,6 +66,55 @@ Name: "{group}\Leer instrucciones"; Filename: "{app}\LEEME-INSTALADOR.txt"
 Filename: "{app}\Jarvis.exe"; Description: "Iniciar Jarvis"; Flags: nowait postinstall skipifsilent
 
 [Code]
+var
+  LocalModelPage: TInputOptionWizardPage;
+
+procedure InitializeWizard;
+var
+  Note: TNewStaticText;
+begin
+  LocalModelPage := CreateInputOptionPage(wpSelectDir,
+    'Modelos de razonamiento local',
+    'Elegí si querés descargar un modelo para ejecutar tareas en esta PC.',
+    'La descarga se completa al abrir Jarvis, desde Ollama. Podés cambiar, descargar o quitar modelos después en la app.', True, False);
+  LocalModelPage.Add('OpenAI / Claude - sin modelo de razonamiento local');
+  LocalModelPage.Add('Qwen3 1.7B - 1,4 GB aprox. - ligero, tareas breves');
+  LocalModelPage.Add('Qwen3 4B - 2,5 GB aprox. - tareas cotidianas');
+  LocalModelPage.Add('Qwen3 8B - 5,2 GB aprox. - tareas con varios pasos');
+  LocalModelPage.Add('Qwen3 14B - 9,3 GB aprox. - mayor consumo');
+  LocalModelPage.SelectedValueIndex := 0;
+  LocalModelPage.CheckListBox.Height := ScaleY(112);
+  Note := TNewStaticText.Create(LocalModelPage);
+  Note.Parent := LocalModelPage.Surface;
+  Note.Left := 0;
+  Note.Top := LocalModelPage.CheckListBox.Top + LocalModelPage.CheckListBox.Height + ScaleY(8);
+  Note.Width := LocalModelPage.SurfaceWidth;
+  Note.Height := ScaleY(58);
+  Note.AutoSize := False;
+  Note.WordWrap := True;
+  Note.Caption := 'La voz no cambia: Jarvis descarga 5,03 GB de voz y activación desde Hugging Face en la primera apertura. RAM/VRAM y velocidad dependen del equipo.';
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  Model, ChoiceFile: string;
+begin
+  if CurStep = ssPostInstall then begin
+    Model := '';
+    case LocalModelPage.SelectedValueIndex of
+      1: Model := 'qwen3:1.7b';
+      2: Model := 'qwen3:4b';
+      3: Model := 'qwen3:8b';
+      4: Model := 'qwen3:14b';
+    end;
+    ChoiceFile := ExpandConstant('{app}\backend\.jarvis-install-choice.json');
+    if Model <> '' then
+      SaveStringToFile(ChoiceFile, '{"model":"' + Model + '"}', False)
+    else
+      DeleteFile(ChoiceFile);
+  end;
+end;
+
 #ifdef ExistingOnly
 function InitializeSetup(): Boolean;
 begin

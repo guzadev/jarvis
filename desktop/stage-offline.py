@@ -108,6 +108,8 @@ class Stage:
                         # Model weights are separately included from the model manifest.
                         continue
                     rel = relative.as_posix()
+                    if rel.startswith('torch/lib/') and rel.endswith('.lib'):
+                        continue  # Static C++ development libraries are not used by voice inference.
                     path = site / safe_relative(rel)
                     verify_parents(path.parent)
                     self.copy(path, prefix + "/" + rel)
@@ -191,12 +193,15 @@ def build(args):
         st=Stage(target)
         st.tree(electron,"")
         st.copy(src/"desktop/LEEME-INSTALADOR.txt","LEEME-INSTALADOR.txt")
+        st.copy(src/"README.md","README.md")
+        st.tree(src/"docs","docs")
         # Use the same source and browser-asset whitelist as the public companion ZIP.
         subprocess.run(["node",str(src/"scripts/package-companion.mjs"),str(work/"zip")],check=True,stdout=subprocess.DEVNULL)
         with zipfile.ZipFile(work/"zip/Jarvis-Codigo-Windows.zip") as bundle:
             index=json.loads(bundle.read("companion-files.json"))["files"]
             for name,digest in index.items():
                 st.copy(src/safe_relative(name),"backend/"+name,digest)
+            st.write("backend/companion-files.json",bundle.read("companion-files.json"))
         for name in ("python.exe","pythonw.exe","python3.dll","python313.dll","LICENSE.txt"):
             st.copy(home/name,"runtime/python/"+name)
         for library, digest in visual_cpp_runtime():
@@ -208,11 +213,12 @@ def build(args):
         st.venv(storage/".owned-voice-venv","data/.owned-voice-venv")
         st.site(storage/"tools/qwen-voice-packages","data/tools/qwen-voice-packages")
         weights=json.loads((src/"qwen-voice-weights.json").read_text(encoding="utf-8-sig"))
-        for name,digest in weights["files"].items():
-            st.copy(storage/"models/qwen3-tts-1.7b-base"/safe_relative(name),"data/models/qwen3-tts-1.7b-base/"+name,digest)
-        stage_ollama(st, storage)
-        for name in WHISPER:
-            st.copy(storage/"models/whisper-small"/name,"data/models/whisper-small/"+name)
+        if args.include_models:
+            for name,digest in weights["files"].items():
+                st.copy(storage/"models/qwen3-tts-1.7b-base"/safe_relative(name),"data/models/qwen3-tts-1.7b-base/"+name,digest)
+            stage_ollama(st, storage)
+            for name in WHISPER:
+                st.copy(storage/"models/whisper-small"/name,"data/models/whisper-small/"+name)
         profile=storage/"models/jarvis-owned"
         state=json.loads((profile/"profile.json").read_text(encoding="utf-8-sig"))
         if not (state.get("approved") is True and state.get("prepared") is True and state.get("engine")=="Qwen3-TTS-12Hz-1.7B-Base" and state.get("model_revision")==weights["revision"] and state.get("profile_sha256")==PROFILE_SHA and state.get("sample_sha256")==SAMPLE_SHA):
@@ -232,4 +238,5 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser()
     for option in ("source","storage","python-home","electron-dir","output"):
         parser.add_argument("--"+option,type=Path,required=True)
+    parser.add_argument('--include-models',action='store_true',help='Private offline build only. Public releases fetch models from their publishers.')
     build(parser.parse_args())
